@@ -3,6 +3,7 @@ package controlador;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -28,6 +29,7 @@ public class WSPersona {
 
 	/**
 	 * Obtiene un cliente en específico
+	 * 
 	 * @param idPer
 	 * @param token
 	 * @return
@@ -63,6 +65,22 @@ public class WSPersona {
 	public persona insPersona(persona objP) {
 		objP.insPersona();
 		return objP;
+	}
+
+	@PUT
+	@Path("/actualizar/{idPer}/{token}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public persona actPersona(persona objP, @PathParam("idPer") int idPer, @PathParam("token") String token) {
+		bitacora objB = new bitacora();
+		objB.setPersona_id(idPer);
+		objB.setToken(token);
+
+		if (objB.validaToken()) {
+			objP.actPersona();
+			return objP;
+		}
+		return null;
 	}
 
 }

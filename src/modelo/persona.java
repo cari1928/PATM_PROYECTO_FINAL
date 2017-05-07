@@ -198,6 +198,26 @@ public class persona {
 		}
 	}
 
+	public void actPersona() {
+		try {
+			conexion objC = new conexion();
+			Connection con = objC.getCon();
+			Statement stmt = con.createStatement();
+
+			String query = "UPDATE persona set nombre='" + this.nombre + "', apellidos='" + this.apellidos
+					+ "', email='" + this.email + "', username='" + this.username + "', pass='"
+					+ objE.encriptaDato("MD5", this.pass) + "', edad=" + this.edad + ", tarjeta='" + this.tarjeta
+					+ "' where persona_id=" + this.persona_id;
+			stmt.executeUpdate(query);
+			this.status = "PUT";
+			con.close();
+
+		} catch (Exception e) {
+			this.status = "ERROR-ACTUALIZAR-PERSONA";
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Para el logueo - bitácora
 	 */
