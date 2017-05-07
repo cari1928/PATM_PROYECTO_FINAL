@@ -32,6 +32,7 @@ public class asientos_reservados {
 		return sala_id;
 	}
 
+	@XmlElement(required = true)
 	public String getStatus() {
 		return status;
 	}
