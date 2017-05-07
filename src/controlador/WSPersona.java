@@ -18,31 +18,30 @@ public class WSPersona {
 	@GET
 	@Path("/validar/{usuario}/{password}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public persona validar(
-			@PathParam("usuario") String usuario, 
-			@PathParam("password") String password) {
+	public persona validar(@PathParam("usuario") String usuario, @PathParam("password") String password) {
 		persona objP = new persona();
 		objP.setUsername(usuario);
 		objP.setPass(password);
 		objP.validaUsuario();
 		return objP;
 	}
-	
+
+	/**
+	 * Obtiene un cliente en específico
+	 * @param idPer
+	 * @param token
+	 * @return
+	 */
 	@GET
-	@Path("/ver/{idPer}/{usr}/{token}")
+	@Path("/ver/{idPer}/{token}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public persona verPersona(
-			@PathParam("idPer") int idPer,
-			@PathParam("usr") String usr,
-			@PathParam("token") String token
-			) 
-	{
-		
+	public persona verPersona(@PathParam("idPer") int idPer, @PathParam("token") String token) {
+
 		bitacora objB = new bitacora();
 		objB.setPersona_id(idPer);
 		objB.setToken(token);
-		
-		if(objB.validaToken()) {
+
+		if (objB.validaToken()) {
 			persona objP = new persona();
 			objP.setPersona_id(idPer);
 			return objP.verPersona();
@@ -50,25 +49,20 @@ public class WSPersona {
 		return null;
 	}
 
+	/**
+	 * No necesito verificar el token porque esto será usado cuando el cliente
+	 * se registre desde la app
+	 * 
+	 * @param objP
+	 * @return
+	 */
 	@POST
-	@Path("/insertar/{idPer}/{token}")
+	@Path("/insertar")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public persona insPersona(
-			persona objP, 
-			@PathParam("idPer") int idPerB, 
-			@PathParam("token") String tokenB) 
-	{
-
-		bitacora objB = new bitacora();
-		objB.setPersona_id(idPerB);
-		objB.setToken(tokenB);
-
-		if (objB.validaToken()) {
-			objP.insPersona();
-			return objP;
-		}
-		return null;
+	public persona insPersona(persona objP) {
+		objP.insPersona();
+		return objP;
 	}
 
 }

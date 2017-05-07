@@ -125,6 +125,7 @@ public class persona {
 
 	/**
 	 * Selecciona un cliente en específico
+	 * 
 	 * @return
 	 */
 	public persona verPersona() {
@@ -133,12 +134,12 @@ public class persona {
 			Connection con = objC.getCon();
 			Statement stmt = con.createStatement();
 
-			//Seleccionamos las personas con un rol de cliente
-			String query = "SELECT * FROM persona WHERE persona_id=" + this.persona_id + 
-					" and persona_id in (select persona_id from privilegio where rol_id=1)";
+			// Seleccionamos las personas con un rol de cliente
+			String query = "SELECT * FROM persona WHERE persona_id=" + this.persona_id
+					+ " and persona_id in (select persona_id from privilegio where rol_id=1)";
 			ResultSet res = stmt.executeQuery(query);
-			
-			if(res.next()) {
+
+			if (res.next()) {
 				this.nombre = res.getString(2);
 				this.apellidos = res.getString(3);
 				this.email = res.getString(4);
@@ -148,14 +149,14 @@ public class persona {
 				this.tarjeta = res.getString(8);
 				this.status = "GET";
 			}
-			
+
 			con.close();
 
 		} catch (Exception e) {
 			status = "ERROR AL OBTENER EL CLIENTE";
 			e.printStackTrace();
 		}
-		
+
 		return this;
 	}
 
@@ -173,7 +174,24 @@ public class persona {
 					+ nombre + "', '" + apellidos + "', '" + email + "', '" + username + "', '"
 					+ objE.encriptaDato("MD5", pass) + "', " + edad + ", '" + tarjeta + "')";
 			stmt.executeUpdate(query);
+
+			// toma el id de la persona recientemente insertada
+			query = "SELECT MAX(persona_id) as persona_id FROM persona";
+			stmt = con.createStatement();
+			ResultSet res = stmt.executeQuery(query);
+
+			if (res.next()) {
+				this.persona_id = res.getInt(1);
+
+				// rol_id=1 porque es el rol de Cliente
+				// res nos da persona_id
+				query = "INSERT INTO privilegio(rol_id, persona_id) values" + "(1, " + this.persona_id + ")";
+				stmt.executeUpdate(query);
+			}
+
 			con.close();
+			this.status = "POST";
+
 		} catch (Exception e) {
 			status = "ERROR AL INSERTAR CLIENTE";
 			e.printStackTrace();
@@ -196,9 +214,12 @@ public class persona {
 				// se actualiza el valor de token
 				generarToken("MD5", username, pass);
 				bitacora objB = new bitacora();
-				objB.setPersona_id(res.getInt("persona_id"));
+				objB.setPersona_id(res.getInt(1));
 				objB.setToken(token);
 				objB.insAcceso();
+
+				this.persona_id = res.getInt(1);
+				this.status = "bitacora";
 
 			} else {
 				this.token = "no_valido";
@@ -212,6 +233,7 @@ public class persona {
 
 	/**
 	 * Para la bitácora
+	 * 
 	 * @param type
 	 * @param user
 	 * @param password
