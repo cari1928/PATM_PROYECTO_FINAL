@@ -203,10 +203,14 @@ public class persona {
 			conexion objC = new conexion();
 			Connection con = objC.getCon();
 			Statement stmt = con.createStatement();
+			
+			if(this.pass.length() != 32) {
+				this.pass = objE.encriptaDato("MD5", this.pass);
+			}
 
 			String query = "UPDATE persona set nombre='" + this.nombre + "', apellidos='" + this.apellidos
 					+ "', email='" + this.email + "', username='" + this.username + "', pass='"
-					+ objE.encriptaDato("MD5", this.pass) + "', edad=" + this.edad + ", tarjeta='" + this.tarjeta
+					+ this.pass + "', edad=" + this.edad + ", tarjeta='" + this.tarjeta
 					+ "' where persona_id=" + this.persona_id;
 			stmt.executeUpdate(query);
 			this.status = "PUT";
@@ -226,7 +230,8 @@ public class persona {
 			conexion objC = new conexion();
 			Connection conn = objC.getCon();
 			Statement stmt = conn.createStatement();
-			pass = objE.encriptaDato("MD5", pass); // encripta pass
+			//pass = objE.encriptaDato("MD5", pass); // encripta pass
+			
 			String query = "SELECT * FROM persona WHERE username='" + username + "' and pass='" + pass + "'";
 			ResultSet res = stmt.executeQuery(query);
 

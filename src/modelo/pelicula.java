@@ -3,6 +3,8 @@ package modelo;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -21,6 +23,9 @@ public class pelicula {
 	private int duracion;
 	private String poster;
 	private String status;
+
+	private List<categoria_pelicula> categorias;
+	private List<reparto> colaboradores;
 
 	@XmlElement(required = true)
 	public int getPelicula_id() {
@@ -57,8 +62,19 @@ public class pelicula {
 		return poster;
 	}
 
+	@XmlElement(required = true)
 	public String getStatus() {
 		return status;
+	}
+
+	@XmlElement(required = true)
+	public List<categoria_pelicula> getCategorias() {
+		return categorias;
+	}
+
+	@XmlElement(required = true)
+	public List<reparto> getColaboradores() {
+		return colaboradores;
 	}
 
 	public void setPelicula_id(int pelicula_id) {
@@ -89,11 +105,74 @@ public class pelicula {
 		this.poster = poster;
 	}
 
+	public void setCategorias(List<categoria_pelicula> categorias) {
+		this.categorias = categorias;
+	}
+
+	public void setColaboradores(List<reparto> colaboradores) {
+		this.colaboradores = colaboradores;
+	}
+
 	public void setStatus(String status) {
 		this.status = status;
 	}
 
+	public List<pelicula> verListaP() {
+		List<pelicula> arrP = null;
+		pelicula objP;
+		categoria_pelicula objCP;
+		List<categoria_pelicula> listCP;
+		reparto objR;
+		List<reparto> listR;
+
+		try {
+			arrP = new ArrayList<>();
+			conexion objC = new conexion();
+			Connection con = objC.getCon();
+			Statement stmt = con.createStatement();
+
+			String query = "SELECT * FROM PELICULA ORDER BY titulo";
+			ResultSet res = stmt.executeQuery(query);
+
+			while (res.next()) {
+				objP = new pelicula();
+				objP.setPelicula_id(res.getInt(1));
+				objP.setTitulo(res.getString(2));
+				objP.setDescripcion(res.getString(3));
+				objP.setF_lanzamiento(res.getString(4));
+				objP.setLenguaje(res.getString(5));
+				objP.setDuracion(res.getInt(6));
+				objP.setPoster(res.getString(7));
+
+				objCP = new categoria_pelicula();
+				objCP.setPelicula_id(res.getInt(1));
+				listCP = objCP.verListaCP();
+				objP.setCategorias(listCP);
+
+				objR = new reparto();
+				objR.setPelicula_id(res.getInt(1));
+				listR = objR.verListaR();
+				objP.setColaboradores(listR);
+
+				objP.setStatus("GET");
+				arrP.add(objP);
+			}
+
+			con.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return arrP;
+	}
+
 	public pelicula verPelicula() {
+		List<categoria_pelicula> listCP;
+		List<reparto> listR;
+		categoria_pelicula objCP;
+		reparto objR;
+
 		try {
 			conexion objC = new conexion();
 			Connection con = objC.getCon();
@@ -109,6 +188,17 @@ public class pelicula {
 				this.lenguaje = res.getString(5);
 				this.duracion = res.getInt(6);
 				this.poster = res.getString(7);
+
+				objCP = new categoria_pelicula();
+				objCP.setPelicula_id(this.pelicula_id);
+				listCP = objCP.verListaCP();
+				this.categorias = listCP;
+
+				objR = new reparto();
+				objR.setPelicula_id(this.getPelicula_id());
+				listR = objR.verListaR();
+				this.colaboradores = listR;
+
 				this.status = "GET";
 			}
 
@@ -118,6 +208,7 @@ public class pelicula {
 			this.status = "ERROR-GET-PELICULA";
 			e.printStackTrace();
 		}
+
 		return this;
 	}
 

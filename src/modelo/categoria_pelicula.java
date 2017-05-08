@@ -3,6 +3,8 @@ package modelo;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -54,22 +56,58 @@ public class categoria_pelicula {
 		this.status = status;
 	}
 
+	public List<categoria_pelicula> verListaCP() {
+		List<categoria_pelicula> arrCP = null;
+		categoria_pelicula objCP;
+		categoria objCa;
+
+		try {
+			arrCP = new ArrayList<>();
+			conexion objC = new conexion();
+			Connection con = objC.getCon();
+			Statement stmt = con.createStatement();
+
+			String query = "SELECT * FROM categoria_pelicula WHERE pelicula_id=" + this.pelicula_id;
+			ResultSet res = stmt.executeQuery(query);
+
+			while (res.next()) {
+				objCP = new categoria_pelicula();
+
+				objCa = new categoria();
+				objCa.setCategoria_id(res.getInt(1));
+				objCa.verCategoria();
+				objCP.categoria = objCa;
+
+				objCP.categoria_pelicula_id = res.getInt(3);
+
+				arrCP.add(objCP);
+			}
+
+			con.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return arrCP;
+	}
+
 	public categoria_pelicula verCategoriaPelicula() {
 		try {
 			conexion objC = new conexion();
 			Connection con = objC.getCon();
 			Statement stmt = con.createStatement();
 
-			String query = "SELECT * FROM categoria_pelicula WHERE categoria_pelicula_id=" + this.categoria_pelicula_id;
+			String query = "SELECT * FROM categoria_pelicula WHERE pelicula_id=" + this.pelicula_id;
 			ResultSet res = stmt.executeQuery(query);
 
 			if (res.next()) {
-				this.pelicula_id = res.getInt(2);
-
 				categoria objCa = new categoria();
 				objCa.setCategoria_id(res.getInt(1));
-				objCa.getCategoria();
+				objCa.verCategoria();
 				this.categoria = objCa;
+
+				this.categoria_pelicula_id = res.getInt(3);
 			}
 
 			this.status = "GET";

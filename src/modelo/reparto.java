@@ -3,6 +3,8 @@ package modelo;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -55,24 +57,62 @@ public class reparto {
 		this.puesto = puesto;
 	}
 
+	public List<reparto> verListaR() {
+		List<reparto> arrR = null;
+		reparto objR;
+		colaborador objC;
+
+		try {
+			arrR = new ArrayList<>();
+			conexion objCon = new conexion();
+			Connection con = objCon.getCon();
+			Statement stmt = con.createStatement();
+
+			String query = "SELECT * FROM reparto WHERE pelicula_id=" + this.pelicula_id;
+			ResultSet res = stmt.executeQuery(query);
+
+			while (res.next()) {
+				objR = new reparto();
+
+				objC = new colaborador();
+				objC.setColaborador_id(res.getInt(1));
+				objC.verColaborador();
+				objR.colaborador = objC;
+
+				objR.puesto = res.getString(3);
+				objR.reparto_id = res.getInt(4);
+				objR.status = "GET";
+
+				arrR.add(objR);
+			}
+
+			con.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return arrR;
+	}
+
 	public reparto verReparto() {
 		try {
 			conexion objC = new conexion();
 			Connection con = objC.getCon();
 			Statement stmt = con.createStatement();
 
-			String query = "SELECT * FROM reparto WHERE reparto_id=" + this.reparto_id;
+			String query = "SELECT * FROM reparto WHERE pelicula_id=" + this.pelicula_id;
 			ResultSet res = stmt.executeQuery(query);
 
 			if (res.next()) {
-				this.pelicula_id = res.getInt(2);
-				this.puesto = res.getString(3);
-				this.status = "GET";
-
 				colaborador objCo = new colaborador();
 				objCo.setColaborador_id(res.getInt(1));
 				objCo.verColaborador();
 				this.colaborador = objCo;
+
+				this.puesto = res.getString(3);
+				this.reparto_id = res.getInt(4);
+				this.status = "GET";
 			}
 
 			con.close();

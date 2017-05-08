@@ -50,7 +50,7 @@ public class categoria {
 			Connection con = objC.getCon();
 			Statement stmt = con.createStatement();
 
-			String query = "SELECT * FROM categoria WHERE id=" + this.categoria_id;
+			String query = "SELECT * FROM categoria WHERE categoria_id=" + this.categoria_id;
 			ResultSet res = stmt.executeQuery(query);
 
 			if (res.next()) {
