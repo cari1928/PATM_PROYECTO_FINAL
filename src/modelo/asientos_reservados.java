@@ -63,6 +63,10 @@ public class asientos_reservados {
 					+ "," + this.asiento_id + "," + this.sala_id + ")";
 			stmt.executeUpdate(query);
 
+			query = "UPDATE sala_asientos SET estado=1 " + "WHERE sala_id=" + this.sala_id + " AND asiento_id="
+					+ this.asiento_id;
+			stmt.executeUpdate(query);
+
 			this.status = "POST";
 			con.close();
 
