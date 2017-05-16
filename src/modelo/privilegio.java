@@ -13,11 +13,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "rol")
-public class rol {
+public class privilegio {
 
+	private int privilegio_id;
 	private int rol_id;
-	private String rol;
+	private int persona_id;
 	private String status;
+
+	@XmlElement(required = true)
+	public int getPrivilegio_id() {
+		return privilegio_id;
+	}
 
 	@XmlElement(required = true)
 	public int getRol_id() {
@@ -25,8 +31,8 @@ public class rol {
 	}
 
 	@XmlElement(required = true)
-	public String getRol() {
-		return rol;
+	public int getPersona_id() {
+		return persona_id;
 	}
 
 	@XmlElement(required = true)
@@ -34,79 +40,85 @@ public class rol {
 		return status;
 	}
 
-	public void setRol_id(int rol_id) {
-		this.rol_id = rol_id;
-	}
-
-	public void setRol(String rol) {
-		this.rol = rol;
-	}
-
 	public void setStatus(String status) {
 		this.status = status;
 	}
 
+	public void setPrivilegio_id(int privilegio_id) {
+		this.privilegio_id = privilegio_id;
+	}
+
+	public void setRol_id(int rol_id) {
+		this.rol_id = rol_id;
+	}
+
+	public void setPersona_id(int persona_id) {
+		this.persona_id = persona_id;
+	}
+
 	/**
-	 * Selecciona todos los roles
+	 * Selecciona todos los privilegios
 	 * 
 	 * @return
 	 */
-	public List<rol> getListaR() {
+	public List<privilegio> getListaP() {
 		// jersey va a tomar cada objeto y retornará un json
-		List<rol> arrR = null;
-		rol objE;
+		List<privilegio> arrP = null;
+		privilegio objP;
 		try {
-			arrR = new ArrayList<>();
+			arrP = new ArrayList<>();
 			conexion objC = new conexion();
 			Connection con = objC.getCon();
 
 			// si va a tener valores
-			String query = "SELECT * FROM rol ORDER BY rol";
+			String query = "SELECT privilegio_id, rol_id, persona_id FROM privilegio ORDER BY privilegio_id";
 			Statement stmt = con.createStatement();
 			ResultSet res = stmt.executeQuery(query);
 
 			while (res.next()) {
-				objE = new rol();
-				objE.rol_id = res.getInt(1);
-				objE.rol = res.getString(2);
+				objP = new privilegio();
+				objP.privilegio_id = res.getInt(1);
+				objP.rol_id = res.getInt(2);
+				objP.persona_id = res.getInt(3);
 
-				arrR.add(objE);
+				arrP.add(objP);
 			}
 
 			this.status = "GET";
 			con.close();
 
 		} catch (Exception e) {
-			status = "ERROR-OBTENER-ROLES";
+			status = "ERROR-OBTENER-PRIVILEGIOS";
 			e.printStackTrace();
 		}
-		return arrR;
+		return arrP;
 	}
 
 	/**
-	 * Selecciona un rol en específico
+	 * Selecciona un privilegio en específico
 	 * 
 	 * @return
 	 */
-	public rol verRol() {
+	public privilegio verPrivilegio() {
 		try {
 			conexion objC = new conexion();
 			Connection con = objC.getCon();
 			Statement stmt = con.createStatement();
 
-			// Seleccionamos los roles
-			String query = "SELECT * FROM rol WHERE rol_id=" + this.rol_id;
+			// Seleccionamos los privilegios
+			String query = "SELECT privilegio_id, rol_id, persona_id FROM privilegio WHERE privilegio_id=" + this.privilegio_id;
 			ResultSet res = stmt.executeQuery(query);
 
 			if (res.next()) {
-				this.rol = res.getString(2);
+				this.rol_id = res.getInt(2);
+				this.persona_id = res.getInt(3);
 				this.status = "GET";
 			}
 
 			con.close();
 
 		} catch (Exception e) {
-			status = "ERROR-OBTENER-ROL";
+			status = "ERROR-OBTENER-PRIVILEGIO";
 			e.printStackTrace();
 		}
 
@@ -114,70 +126,72 @@ public class rol {
 	}
 
 	/**
-	 * Inserta un Rol
+	 * Inserta un Privilegio
 	 */
-	public void insRol() {
+	public void insPrivilegio() {
 		try {
 			conexion objC = new conexion();
 			Connection con = objC.getCon();
 			Statement stmt = con.createStatement();
 
-			String query = "INSERT INTO rol(rol)" + " VALUES('" + this.rol + "')";
+			String query = "INSERT INTO privilegio(rol_id, persona_id)" + " VALUES(" + this.rol_id + ", "
+					+ this.persona_id + ")";
 			stmt.executeUpdate(query);
 
 			// toma el id de la persona recientemente insertada
-			query = "SELECT MAX(rol_id) as rol_id FROM rol";
+			query = "SELECT MAX(privilegio_id) as privilegio_id FROM privilegio";
 			stmt = con.createStatement();
 			ResultSet res = stmt.executeQuery(query);
-			
+
 			if (res.next()) {
-				this.rol_id = res.getInt(1);
+				this.privilegio_id = res.getInt(1);
 			}
 			this.status = "POST";
 			con.close();
-			
+
 		} catch (Exception e) {
-			this.status = "ERROR-INSERTAR-ROL";
+			this.status = "ERROR-INSERTAR-PRIVILEGIO";
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * Actualiza un Rol
+	 * Actualiza un Privilegio
 	 */
-	public void actRol() {
+	public void actPrivilegio() {
 		try {
 			conexion objC = new conexion();
 			Connection con = objC.getCon();
 			Statement stmt = con.createStatement();
 
-			String query = "UPDATE rol SET rol='" + this.rol + "' WHERE rol_id=" + this.rol_id;
+			String query = "UPDATE privilegio SET rol_id=" + this.rol_id + ", persona_id=" + this.persona_id
+					+ " WHERE privilegio_id=" + this.privilegio_id;
 			stmt.executeUpdate(query);
 			this.status = "PUT";
 			con.close();
 
 		} catch (Exception e) {
-			this.status = "ERROR-ACTUALIZAR-ROL";
+			this.status = "ERROR-ACTUALIZAR-PRIVILEGIO";
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * Elimina un rol
+	 * Elimina un Privilegio
 	 */
-	public void delRol() {
+	public void delPrivilegio() {
 		try {
 			conexion objC = new conexion();
 			Connection con = objC.getCon();
 			Statement stmt = con.createStatement();
 
-			String query = "DELETE FROM rol where rol_id=" + this.rol_id;
+			String query = "DELETE FROM privilegio where privilegio_id=" + this.privilegio_id;
 			stmt.executeUpdate(query);
 			this.status = "DELETE";
 			con.close();
 
 		} catch (Exception e) {
-			this.status = "ERROR-ELIMINAR-ROL";
+			this.status = "ERROR-ELIMINAR-PRIVILEGIO";
 			e.printStackTrace();
 		}
 	}
