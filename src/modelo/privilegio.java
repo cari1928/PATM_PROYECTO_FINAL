@@ -12,13 +12,16 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement(name = "rol")
+@XmlRootElement(name = "privilegio")
 public class privilegio {
 
 	private int privilegio_id;
 	private int rol_id;
 	private int persona_id;
+
 	private String status;
+	private String mensaje;
+	private String estado;
 
 	@XmlElement(required = true)
 	public int getPrivilegio_id() {
@@ -38,6 +41,24 @@ public class privilegio {
 	@XmlElement(required = true)
 	public String getStatus() {
 		return status;
+	}
+
+	@XmlElement(required = true)
+	public String getMensaje() {
+		return mensaje;
+	}
+
+	@XmlElement(required = true)
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setMensaje(String mensaje) {
+		this.mensaje = mensaje;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
 	}
 
 	public void setStatus(String status) {
@@ -85,10 +106,13 @@ public class privilegio {
 			}
 
 			this.status = "GET";
+			this.estado = "1";
 			con.close();
 
 		} catch (Exception e) {
-			status = "ERROR-OBTENER-PRIVILEGIOS";
+			this.status = "ERROR-OBTENER-PRIVILEGIOS";
+			this.estado = "1";
+			this.mensaje = "ERROR-OBTENER-PRIVILEGIOS";
 			e.printStackTrace();
 		}
 		return arrP;
@@ -106,19 +130,23 @@ public class privilegio {
 			Statement stmt = con.createStatement();
 
 			// Seleccionamos los privilegios
-			String query = "SELECT privilegio_id, rol_id, persona_id FROM privilegio WHERE privilegio_id=" + this.privilegio_id;
+			String query = "SELECT privilegio_id, rol_id, persona_id FROM privilegio WHERE privilegio_id="
+					+ this.privilegio_id;
 			ResultSet res = stmt.executeQuery(query);
 
 			if (res.next()) {
 				this.rol_id = res.getInt(2);
 				this.persona_id = res.getInt(3);
 				this.status = "GET";
+				this.estado = "1";
 			}
 
 			con.close();
 
 		} catch (Exception e) {
-			status = "ERROR-OBTENER-PRIVILEGIO";
+			this.status = "ERROR-OBTENER-PRIVILEGIO";
+			this.estado = "2";
+			this.mensaje = "ERROR-OBTENER-PRIVILEGIO";
 			e.printStackTrace();
 		}
 
@@ -147,10 +175,13 @@ public class privilegio {
 				this.privilegio_id = res.getInt(1);
 			}
 			this.status = "POST";
+			this.estado = "1";
 			con.close();
 
 		} catch (Exception e) {
 			this.status = "ERROR-INSERTAR-PRIVILEGIO";
+			this.estado = "2";
+			this.mensaje = "ERROR-INSERTAR-PRIVILEGIO";
 			e.printStackTrace();
 		}
 	}
@@ -168,10 +199,13 @@ public class privilegio {
 					+ " WHERE privilegio_id=" + this.privilegio_id;
 			stmt.executeUpdate(query);
 			this.status = "PUT";
+			this.estado = "1";
 			con.close();
 
 		} catch (Exception e) {
 			this.status = "ERROR-ACTUALIZAR-PRIVILEGIO";
+			this.estado = "2";
+			this.mensaje = "ERROR-ACTUALIZAR-PRIVILEGIO";
 			e.printStackTrace();
 		}
 	}
@@ -188,10 +222,13 @@ public class privilegio {
 			String query = "DELETE FROM privilegio where privilegio_id=" + this.privilegio_id;
 			stmt.executeUpdate(query);
 			this.status = "DELETE";
+			this.estado = "1";
 			con.close();
 
 		} catch (Exception e) {
 			this.status = "ERROR-ELIMINAR-PRIVILEGIO";
+			this.estado = "2";
+			this.mensaje = "ERROR-ELIMINAR-PRIVILEGIO";
 			e.printStackTrace();
 		}
 	}
