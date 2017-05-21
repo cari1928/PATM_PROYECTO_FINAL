@@ -56,6 +56,66 @@ public class categoria_pelicula {
 		this.status = status;
 	}
 
+	/**
+	 * Listado de categorías-películas, en base a una película, con restricción
+	 * de tiempo
+	 * 
+	 * @return
+	 */
+	public List<categoria_pelicula> verListaCApp() {
+		List<categoria_pelicula> arrCP = null;
+		categoria_pelicula objCP;
+		categoria objCa;
+
+		try {
+			arrCP = new ArrayList<>();
+			conexion objC = new conexion();
+			Connection con = objC.getCon();
+			Statement stmt = con.createStatement();
+
+			String query = "SELECT cp.categoria_id, cp.pelicula_id, cp.categoria_pelicula_id FROM funcion f "
+					+ "INNER JOIN pelicula p ON p.pelicula_id = f.pelicula_id "
+					+ "INNER JOIN categoria_pelicula cp ON cp.pelicula_id = p.pelicula_id "
+					+ "WHERE NOW() BETWEEN fecha AND fecha_fin "
+					+ "AND (hora > (NOW()::time) OR (now()::time) < (hora_fin - ('00:30:0'::time)))";
+			ResultSet res = stmt.executeQuery(query);
+
+			if (!res.next()) {
+				objCP = new categoria_pelicula();
+				objCP.status = "ERROR-SIN-VALORES";
+				arrCP.add(objCP);
+				return arrCP;
+			}
+
+			while (res.next()) {
+				objCP = new categoria_pelicula();
+
+				objCa = new categoria();
+				objCa.setCategoria_id(res.getInt(1));
+				objCa.verCategoria();
+				objCP.categoria = objCa;
+
+				objCP.pelicula_id = res.getInt(2);
+				objCP.categoria_pelicula_id = res.getInt(3);
+
+				arrCP.add(objCP);
+			}
+
+			con.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return arrCP;
+	}
+
+	/**
+	 * Listado de categorías-películas, en base a una película, sin restricción
+	 * de tiempo
+	 * 
+	 * @return
+	 */
 	public List<categoria_pelicula> verListaCP() {
 		List<categoria_pelicula> arrCP = null;
 		categoria_pelicula objCP;
@@ -92,6 +152,12 @@ public class categoria_pelicula {
 		return arrCP;
 	}
 
+	/**
+	 * Característica específica obtenida mediante una película, sin restricción
+	 * de tiempo
+	 * 
+	 * @return
+	 */
 	public categoria_pelicula verCategoriaPelicula() {
 		try {
 			conexion objC = new conexion();

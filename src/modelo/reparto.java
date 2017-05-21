@@ -41,6 +41,15 @@ public class reparto {
 		return puesto;
 	}
 
+	@XmlElement(required = true)
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
 	public void setReparto_id(int reparto_id) {
 		this.reparto_id = reparto_id;
 	}
@@ -57,6 +66,61 @@ public class reparto {
 		this.puesto = puesto;
 	}
 
+	/**
+	 * Listado de repartos CON restricción de tiempo
+	 * 
+	 * @return
+	 */
+	public List<reparto> verListaRApp() {
+		List<reparto> arrR = new ArrayList<>();
+		reparto objR;
+		colaborador objC;
+
+		try {
+			conexion objCon = new conexion();
+			Connection con = objCon.getCon();
+			Statement stmt = con.createStatement();
+
+			String query = "SELECT DISTINCT r.colaborador_id, r.pelicula_id, r.puesto, r.reparto_id FROM funcion f "
+					+ "INNER JOIN pelicula p ON p.pelicula_id = f.pelicula_id "
+					+ "INNER JOIN reparto r ON r.pelicula_id = p.pelicula_id "
+					+ "WHERE NOW() BETWEEN fecha AND fecha_fin "
+					+ "AND (hora > (NOW()::time) OR (now()::time) < (hora_fin - ('00:30:0'::time)))";
+			ResultSet res = stmt.executeQuery(query);
+
+			while (res.next()) {
+				objR = new reparto();
+
+				objC = new colaborador();
+				objC.setColaborador_id(res.getInt(1));
+				objC.verColaborador();
+				objR.colaborador = objC;
+
+				objR.pelicula_id = res.getInt(2);
+				objR.puesto = res.getString(3);
+				objR.reparto_id = res.getInt(4);
+				objR.status = "GET";
+
+				arrR.add(objR);
+			}
+
+			con.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			objR = new reparto();
+			objR.status = "ERROR-GET-REPARTO";
+			arrR.add(objR);
+		}
+
+		return arrR;
+	}
+
+	/**
+	 * Listado de repartos sin restricción de tiempo
+	 * 
+	 * @return
+	 */
 	public List<reparto> verListaR() {
 		List<reparto> arrR = null;
 		reparto objR;
@@ -95,6 +159,51 @@ public class reparto {
 		return arrR;
 	}
 
+	/**
+	 * Obtiene un reparto en específico en base a una película, con restricción
+	 * de tiempo
+	 * 
+	 * @return
+	 */
+	public reparto verRepartoApp() {
+		try {
+			conexion objC = new conexion();
+			Connection con = objC.getCon();
+			Statement stmt = con.createStatement();
+
+			String query = "SELECT * FROM funcion f INNER JOIN pelicula p ON p.pelicula_id = f.pelicula_id "
+					+ "INNER JOIN reparto r ON r.pelicula_id = p.pelicula_id "
+					+ "WHERE now() between fecha and fecha_fin "
+					+ "AND (hora > (now()::time) or (now()::time) < (hora_fin - ('00:30:0'::time))) "
+					+ "AND pelicula_id=" + this.pelicula_id;
+			ResultSet res = stmt.executeQuery(query);
+
+			if (res.next()) {
+				colaborador objCo = new colaborador();
+				objCo.setColaborador_id(res.getInt(1));
+				objCo.verColaborador();
+				this.colaborador = objCo;
+
+				this.puesto = res.getString(3);
+				this.reparto_id = res.getInt(4);
+				this.status = "GET";
+			}
+
+			con.close();
+
+		} catch (Exception e) {
+			this.status = "ERROR-GET-REPARTO";
+			e.printStackTrace();
+		}
+		return this;
+	}
+
+	/**
+	 * Obtiene un reparto en específico en base a una película, sin restricción
+	 * de tiempo
+	 * 
+	 * @return
+	 */
 	public reparto verReparto() {
 		try {
 			conexion objC = new conexion();
