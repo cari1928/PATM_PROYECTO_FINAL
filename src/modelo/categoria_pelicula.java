@@ -16,12 +16,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class categoria_pelicula {
 
 	private categoria categoria;
+	private pelicula pelicula;
 	private int pelicula_id;
+	private int categoria_id;
 	private int categoria_pelicula_id;
 	private String status;
 
 	@XmlElement(required = true)
-	public categoria getCategoria_id() {
+	public categoria getCategoriaId() {
 		return categoria;
 	}
 
@@ -40,7 +42,26 @@ public class categoria_pelicula {
 		return status;
 	}
 
-	public void setCategoria_id(categoria categoria_id) {
+	@XmlElement(required = true)
+	public categoria getCategoria() {
+		return categoria;
+	}
+
+	@XmlElement(required = true)
+	public pelicula getPelicula() {
+		return pelicula;
+	}
+
+	@XmlElement(required = true)
+	public int getCategoria_id() {
+		return categoria_id;
+	}
+
+	public void setCategoria_id(int categoria_id) {
+		this.categoria_id = categoria_id;
+	}
+
+	public void setCategoriaId(categoria categoria_id) {
 		this.categoria = categoria_id;
 	}
 
@@ -54,6 +75,14 @@ public class categoria_pelicula {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public void setCategoria(categoria categoria) {
+		this.categoria = categoria;
+	}
+
+	public void setPelicula(pelicula pelicula) {
+		this.pelicula = pelicula;
 	}
 
 	/**
@@ -153,6 +182,54 @@ public class categoria_pelicula {
 	}
 
 	/**
+	 * TODO EL Listado de categorías-películas
+	 * 
+	 * @return
+	 */
+	public List<categoria_pelicula> verFullListado() {
+		List<categoria_pelicula> arrCP = new ArrayList<>();
+		categoria_pelicula objCP = new categoria_pelicula();
+		categoria objCa;
+		pelicula objP;
+
+		try {
+			conexion objC = new conexion();
+			Connection con = objC.getCon();
+			Statement stmt = con.createStatement();
+
+			String query = "SELECT * FROM categoria_pelicula ORDER BY categoria_pelicula_id DESC";
+			ResultSet res = stmt.executeQuery(query);
+
+			while (res.next()) {
+				objCP = new categoria_pelicula();
+
+				objCa = new categoria();
+				objCa.setCategoria_id(res.getInt(1));
+				objCa.verCategoria();
+				objCP.categoria = objCa;
+
+				objP = new pelicula();
+				objP.setPelicula_id(res.getInt(2));
+				objP.verSoloPelicula();
+				objCP.pelicula = objP;
+
+				objCP.categoria_pelicula_id = res.getInt(3);
+
+				arrCP.add(objCP);
+			}
+
+			con.close();
+
+		} catch (Exception e) {
+			objCP.setStatus("ERROR-INSERTAR-CATEGORIA-PELICULA");
+			arrCP.add(objCP);
+			e.printStackTrace();
+		}
+
+		return arrCP;
+	}
+
+	/**
 	 * Característica específica obtenida mediante una película, sin restricción
 	 * de tiempo
 	 * 
@@ -184,6 +261,77 @@ public class categoria_pelicula {
 			e.printStackTrace();
 		}
 		return this;
+	}
+
+	/**
+	 * Insertar
+	 */
+	public void insCategoria() {
+		try {
+			conexion objC = new conexion();
+			Connection con = objC.getCon();
+			Statement stmt = con.createStatement();
+
+			String query = "INSERT INTO categoria_pelicula(categoria_id, pelicula_id) VALUES(" + this.categoria_id
+					+ ", " + this.pelicula_id + ")";
+			stmt.executeUpdate(query);
+
+			// toma el id recientemente insertada
+			query = "SELECT MAX(categoria_pelicula_id) as categoria_pelicula_id FROM categoria_pelicula";
+			stmt = con.createStatement();
+			ResultSet res = stmt.executeQuery(query);
+
+			if (res.next()) {
+				this.categoria_pelicula_id = res.getInt(1);
+			}
+			this.status = "POST";
+			con.close();
+
+		} catch (Exception e) {
+			this.status = "ERROR-INSERTAR-CATEGORIA";
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Actualizar
+	 */
+	public void actCategoria() {
+		try {
+			conexion objC = new conexion();
+			Connection con = objC.getCon();
+			Statement stmt = con.createStatement();
+
+			String query = "UPDATE categoria_pelicula SET categoria_id=" + this.categoria_id + ", pelicula_id="
+					+ this.pelicula_id + " WHERE categoria_pelicula_id=" + this.categoria_pelicula_id;
+			stmt.executeUpdate(query);
+			this.status = "PUT";
+			con.close();
+
+		} catch (Exception e) {
+			this.status = "ERROR-ACTUALIZAR-CATEGORIA";
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Eliminar
+	 */
+	public void delCategoria() {
+		try {
+			conexion objC = new conexion();
+			Connection con = objC.getCon();
+			Statement stmt = con.createStatement();
+
+			String query = "DELETE FROM categoria_pelicula where categoria_pelicula_id=" + this.categoria_pelicula_id;
+			stmt.executeUpdate(query);
+			this.status = "DELETE";
+			con.close();
+
+		} catch (Exception e) {
+			this.status = "ERROR-ELIMINAR-CATEGORIA";
+			e.printStackTrace();
+		}
 	}
 
 }

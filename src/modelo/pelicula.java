@@ -171,6 +171,46 @@ public class pelicula {
 
 		return arrP;
 	}
+	
+	/**
+	 * Listado de películas, SIN restricción de tiempo
+	 * 
+	 * @return
+	 */
+	public List<pelicula> verListaFull() {
+		List<pelicula> arrP = null;
+		pelicula objP;
+		categoria_pelicula objCP;
+		List<categoria_pelicula> listCP;
+		reparto objR;
+		List<reparto> listR;
+
+		try {
+			arrP = new ArrayList<>();
+			conexion objC = new conexion();
+			Connection con = objC.getCon();
+			Statement stmt = con.createStatement();
+
+			String query = "SELECT * FROM PELICULA ORDER BY titulo";
+			ResultSet res = stmt.executeQuery(query);
+
+			while (res.next()) {
+				objP = new pelicula();
+				objP.setPelicula_id(res.getInt(1));
+				objP.setTitulo(res.getString(2));
+				
+				objP.setStatus("GET");
+				arrP.add(objP);
+			}
+
+			con.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return arrP;
+	}
 
 	/**
 	 * Para la app. Listado de películas, SIN restricción de tiempo
@@ -267,6 +307,45 @@ public class pelicula {
 				listR = objR.verListaR();
 				this.colaboradores = listR;
 
+				this.status = "GET";
+			}
+
+			con.close();
+
+		} catch (Exception e) {
+			this.status = "ERROR-GET-PELICULA";
+			e.printStackTrace();
+		}
+
+		return this;
+	}
+
+	/**
+	 * Obtiene una película mediante pelicula_id sin mas ni menos
+	 * 
+	 * @return
+	 */
+	public pelicula verSoloPelicula() {
+		List<categoria_pelicula> listCP;
+		List<reparto> listR;
+		categoria_pelicula objCP;
+		reparto objR;
+
+		try {
+			conexion objC = new conexion();
+			Connection con = objC.getCon();
+			Statement stmt = con.createStatement();
+
+			String query = "SELECT * FROM pelicula WHERE pelicula_id=" + this.pelicula_id;
+			ResultSet res = stmt.executeQuery(query);
+
+			if (res.next()) {
+				this.titulo = res.getString(2);
+				this.descripcion = res.getString(3);
+				this.f_lanzamiento = res.getString(4);
+				this.lenguaje = res.getString(5);
+				this.duracion = res.getInt(6);
+				this.poster = res.getString(7);
 				this.status = "GET";
 			}
 

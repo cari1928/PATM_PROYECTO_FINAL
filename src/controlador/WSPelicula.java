@@ -31,6 +31,22 @@ public class WSPelicula {
 	}
 
 	@GET
+	@Path("/listado/full/{idPer}/{token}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<pelicula> getListadoFull(@PathParam("idPer") int idPer, @PathParam("token") String token) {
+		bitacora objB = new bitacora();
+		objB.setPersona_id(idPer);
+		objB.setToken(token);
+
+		if (objB.validaToken()) {
+			pelicula objP = new pelicula();
+			return objP.verListaFull();
+		}
+
+		return null;
+	}
+
+	@GET
 	@Path("/ver/{idPeli}/{idPer}/{token}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public pelicula verPelicula(@PathParam("idPeli") int idPeli, @PathParam("idPer") int idPer,

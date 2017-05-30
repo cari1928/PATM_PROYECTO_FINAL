@@ -20,8 +20,6 @@ public class WSCategoria {
 
 	/**
 	 * Para la app, muestra categorías con restricción de tiempo
-	 * 
-	 * @return
 	 */
 	@GET
 	@Path("/listado/app")
