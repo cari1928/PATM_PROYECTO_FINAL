@@ -119,38 +119,48 @@ public class privilegio {
 	}
 
 	/**
-	 * Selecciona un privilegio en específico
+	 * Selecciona un privilegio en específico en base a una persona_id Usado por
+	 * cineMaster
 	 * 
 	 * @return
 	 */
-	public privilegio verPrivilegio() {
+	public List<privilegio> verPrivilegio() {
+		List<privilegio> arrP = new ArrayList<>();
+		privilegio objP;
+
 		try {
 			conexion objC = new conexion();
 			Connection con = objC.getCon();
 			Statement stmt = con.createStatement();
 
 			// Seleccionamos los privilegios
-			String query = "SELECT privilegio_id, rol_id, persona_id FROM privilegio WHERE privilegio_id="
-					+ this.privilegio_id;
+			String query = "SELECT privilegio_id, rol_id, persona_id FROM privilegio WHERE persona_id="
+					+ this.persona_id;
 			ResultSet res = stmt.executeQuery(query);
 
-			if (res.next()) {
-				this.rol_id = res.getInt(2);
-				this.persona_id = res.getInt(3);
-				this.status = "GET";
-				this.estado = "1";
+			while (res.next()) {
+				objP = new privilegio();
+				objP.privilegio_id = res.getInt(1);
+				objP.rol_id = res.getInt(2);
+				objP.persona_id = res.getInt(3);
+				objP.status = "GET";
+				objP.estado = "1";
+
+				arrP.add(objP);
 			}
 
 			con.close();
 
 		} catch (Exception e) {
-			this.status = "ERROR-OBTENER-PRIVILEGIO";
-			this.estado = "2";
-			this.mensaje = "ERROR-OBTENER-PRIVILEGIO";
+			objP = new privilegio();
+			objP.status = "ERROR-OBTENER-PRIVILEGIO";
+			objP.estado = "2";
+			objP.mensaje = "ERROR-OBTENER-PRIVILEGIO";
+			arrP.add(objP);
 			e.printStackTrace();
 		}
 
-		return this;
+		return arrP;
 	}
 
 	/**

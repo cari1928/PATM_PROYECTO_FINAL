@@ -28,6 +28,29 @@ public class WSPersona {
 	}
 
 	/**
+	 * Obtiene una persona
+	 * 
+	 * @param idPer
+	 * @param token
+	 * @return
+	 */
+	@GET
+	@Path("/verp/{idPer}/{token}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public persona verPersonaById(@PathParam("idPer") int idPer, @PathParam("token") String token) {
+		bitacora objB = new bitacora();
+		objB.setPersona_id(idPer);
+		objB.setToken(token);
+		persona objP = new persona();
+		if (objB.validaToken()) {
+			objP.setPersona_id(idPer);
+			return objP.verPersonaById();
+		}
+		objP.setStatus("ERROR-TOKEN");
+		return objP;
+	}
+
+	/**
 	 * Obtiene un cliente en específico
 	 * 
 	 * @param idPer

@@ -191,4 +191,74 @@ public class categoria {
 		return this;
 	}
 
+	/**
+	 * Insertar
+	 */
+	public void insCategoria() {
+		try {
+			conexion objC = new conexion();
+			Connection con = objC.getCon();
+			Statement stmt = con.createStatement();
+
+			String query = "INSERT INTO categoria(categoria) VALUES('" + this.categoria + "')";
+			stmt.executeUpdate(query);
+
+			// toma el id recientemente insertada
+			query = "SELECT MAX(categoria_id) as categoria_id FROM categoria";
+			stmt = con.createStatement();
+			ResultSet res = stmt.executeQuery(query);
+
+			if (res.next()) {
+				this.categoria_id = res.getInt(1);
+			}
+			this.status = "POST";
+			con.close();
+
+		} catch (Exception e) {
+			this.status = "ERROR-INSERTAR-CATEGORIA";
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Actualizar
+	 */
+	public void actCategoria() {
+		try {
+			conexion objC = new conexion();
+			Connection con = objC.getCon();
+			Statement stmt = con.createStatement();
+
+			String query = "UPDATE categoria SET categoria='" + this.categoria + "' WHERE categoria_id="
+					+ this.categoria_id;
+			stmt.executeUpdate(query);
+			this.status = "PUT";
+			con.close();
+
+		} catch (Exception e) {
+			this.status = "ERROR-ACTUALIZAR-CATEGORIA";
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Eliminar
+	 */
+	public void delCategoria() {
+		try {
+			conexion objC = new conexion();
+			Connection con = objC.getCon();
+			Statement stmt = con.createStatement();
+
+			String query = "DELETE FROM categoria where categoria_id=" + this.categoria_id;
+			stmt.executeUpdate(query);
+			this.status = "DELETE";
+			con.close();
+
+		} catch (Exception e) {
+			this.status = "ERROR-ELIMINAR-CATEGORIA";
+			e.printStackTrace();
+		}
+	}
+
 }

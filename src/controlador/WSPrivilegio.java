@@ -1,5 +1,6 @@
 package controlador;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -34,22 +35,34 @@ public class WSPrivilegio {
 		return null;
 	}
 
+	/**
+	 * Obtiene los roles de una persona en base a persona_id Usado por
+	 * cineMaster
+	 * 
+	 * @param idPer
+	 * @param token
+	 * @return
+	 */
 	@GET
-	@Path("/ver/{idPriv}/{idPer}/{token}")
+	@Path("/ver/{idPer}/{token}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public privilegio verEmpleado(@PathParam("idPriv") int idPriv, @PathParam("idPer") int idPer,
-			@PathParam("token") String token) {
+	public List<privilegio> verEmpleado(@PathParam("idPer") int idPer, @PathParam("token") String token) {
 
+		List<privilegio> arrP;
 		bitacora objB = new bitacora();
 		objB.setPersona_id(idPer);
 		objB.setToken(token);
 
+		privilegio objP = new privilegio();
 		if (objB.validaToken()) {
-			privilegio objP = new privilegio();
-			objP.setPrivilegio_id(idPriv);
+			objP.setPersona_id(idPer);
 			return objP.verPrivilegio();
 		}
-		return null;
+
+		objP.setMensaje("ERROR-TOKEN-NO-VALIDO");
+		arrP = new ArrayList<>();
+		arrP.add(objP);
+		return arrP;
 	}
 
 	@POST

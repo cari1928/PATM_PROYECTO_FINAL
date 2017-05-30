@@ -124,6 +124,39 @@ public class persona {
 	}
 
 	/**
+	 * Selecciona una persona
+	 * 
+	 * @return
+	 */
+	public persona verPersonaById() {
+		try {
+			conexion objC = new conexion();
+			Connection con = objC.getCon();
+			Statement stmt = con.createStatement();
+
+			// Seleccionamos las personas con un rol de cliente
+			String query = "SELECT * FROM persona WHERE persona_id=" + this.persona_id;
+			ResultSet res = stmt.executeQuery(query);
+
+			if (res.next()) {
+				this.nombre = res.getString(2);
+				this.apellidos = res.getString(3);
+				this.email = res.getString(4);
+				this.username = res.getString(5);
+				this.pass = res.getString(6);
+				this.edad = res.getInt(7);
+				this.tarjeta = res.getString(8);
+				this.status = "GET";
+			}
+			con.close();
+		} catch (Exception e) {
+			this.status = "ERROR AL OBTENER EL CLIENTE";
+			e.printStackTrace();
+		}
+		return this;
+	}
+
+	/**
 	 * Selecciona un cliente en específico
 	 * 
 	 * @return
@@ -203,15 +236,14 @@ public class persona {
 			conexion objC = new conexion();
 			Connection con = objC.getCon();
 			Statement stmt = con.createStatement();
-			
-			if(this.pass.length() != 32) {
+
+			if (this.pass.length() != 32) {
 				this.pass = objE.encriptaDato("MD5", this.pass);
 			}
 
 			String query = "UPDATE persona set nombre='" + this.nombre + "', apellidos='" + this.apellidos
-					+ "', email='" + this.email + "', username='" + this.username + "', pass='"
-					+ this.pass + "', edad=" + this.edad + ", tarjeta='" + this.tarjeta
-					+ "' where persona_id=" + this.persona_id;
+					+ "', email='" + this.email + "', username='" + this.username + "', pass='" + this.pass + "', edad="
+					+ this.edad + ", tarjeta='" + this.tarjeta + "' where persona_id=" + this.persona_id;
 			stmt.executeUpdate(query);
 			this.status = "PUT";
 			con.close();
@@ -230,8 +262,8 @@ public class persona {
 			conexion objC = new conexion();
 			Connection conn = objC.getCon();
 			Statement stmt = conn.createStatement();
-			//pass = objE.encriptaDato("MD5", pass); // encripta pass
-			
+			// pass = objE.encriptaDato("MD5", pass); // encripta pass
+
 			String query = "SELECT * FROM persona WHERE username='" + username + "' and pass='" + pass + "'";
 			ResultSet res = stmt.executeQuery(query);
 
